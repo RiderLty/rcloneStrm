@@ -4,8 +4,8 @@ import os
 
 
 def getDownloadQueue(src, dst, host):
-    srcFiles = json.loads(executeCommand(f'rclone lsjson --dirs-only --max-depth 1 {src}')["out"])
-    dstFiles = json.loads(executeCommand(f'rclone lsjson --dirs-only --max-depth 1 {dst}')["out"])
+    srcFiles = json.loads(executeCommand(f"rclone lsjson --dirs-only --max-depth 1 {src}")["out"])
+    dstFiles = json.loads(executeCommand(f"rclone lsjson --dirs-only --max-depth 1 {dst}")["out"])
     lackDirs = setDifference(srcFiles, dstFiles, lambda a, b: a["Path"] == b["Path"])  # 只比对路径
     copyList = []
     strmList = []
@@ -32,35 +32,22 @@ syncList = [
 ]
 
 
-allCopyList = []
-allStrmList = []
+result = [getDownloadQueue(src, dst, host) for src, dst, host in syncList]
 
-for src, dst, host in syncList:
-    copyList, strmList = getDownloadQueue(src, dst, host)
-    allCopyList.extend(copyList)
-    allStrmList.extend(strmList)
+for copyList, _ in result:
+    rcloneCopy(copyList, True, 8)
+for _, strmList in result:
+    [print(f"{url} > {filePath}\n") for url, filePath in strmList]
 
-if len(allCopyList) == 0 and len(allStrmList) == 0:
-    print("UPTODATE")
-    exit()
-
-
-print("DOWNLOAD"+"="*28)
-rcloneCopy(allCopyList, True, 8)
-print("STRM"+"="*32)
-for url,filePath in allStrmList:
-    print(f"{url}\n{filePath}\n")
-    
 if input("输入 y 来继续") == "y":
-    print("DOWNLOAD"+"="*32)
-    rcloneCopy(allCopyList, False, 8)
-    print("STRM"+"="*32)
-    for url,filePath in allStrmList:
-        print(f"{url}\n{filePath}\n")
-        directory = os.path.dirname(filePath)
-        os.makedirs(directory,exist_ok=True)
-        with open(filePath,'w' , encoding="UTF-8") as f:
-            f.write(url)
-            
-os.system("chmod 777 -R /mnt/storage/Media/EmbyMedia")
+    for copyList, _ in result:
+        rcloneCopy(copyList, False, 8)
+    for _, strmList in result:
+        for url, filePath in strmList:
+            print(f"{url} > {filePath}\n")
+            directory = os.path.dirname(filePath)
+            os.makedirs(directory, exist_ok=True)
+            with open(filePath, "w", encoding="UTF-8") as f:
+                f.write(url)
 
+os.system("chmod 777 -R /mnt/storage/Media/EmbyMedia")

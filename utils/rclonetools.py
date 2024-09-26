@@ -118,14 +118,13 @@ def rcloneDelete(deleteList, dry_run=True, worker_num=2):
     """
     sem = threading.Semaphore(worker_num)
     for dst in deleteList:
+        print(f"DELETE:\n{dst}\n")
         sem.acquire()
 
         def worker():
             try:
                 res = executeCommand(f'rclone delete "{dst}"', dry_run)
-                if res["code"] == 0:
-                    print(f"DELETE:\n{dst}\n")
-                else:
+                if res["code"] != 0:
                     print(f'出错:{res["error"]} {dst}')
             except Exception as e:
                 print(e)
