@@ -91,9 +91,8 @@ def rcloneCopy(copyList, dry_run=True, worker_num=2):
     """
     sem = threading.Semaphore(worker_num)
     for src, dst in copyList:
-        print(f"{src} => {dst}\n")
+        print(f"🌏️ {src} 👉️ {dst}")
         sem.acquire()
-
         def worker():
             try:
                 res = executeCommand(f'rclone copyto "{src}" "{dst}"', dry_run)
@@ -118,7 +117,7 @@ def rcloneDelete(deleteList, dry_run=True, worker_num=2):
     """
     sem = threading.Semaphore(worker_num)
     for dst in deleteList:
-        print(f"DELETE:\n{dst}\n")
+        print(f"🚮 DELETE: {dst}")
         sem.acquire()
 
         def worker():

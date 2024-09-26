@@ -37,14 +37,14 @@ result = [getDownloadQueue(src, dst, host) for src, dst, host in syncList]
 for copyList, _ in result:
     rcloneCopy(copyList, True, 8)
 for _, strmList in result:
-    [print(f"{url} > {filePath}\n") for url, filePath in strmList]
+    [print(f"🔗 {url} 📝 {filePath}") for url, filePath in strmList]
 
 if input("输入 y 来继续") == "y":
     for copyList, _ in result:
         rcloneCopy(copyList, False, 8)
     for _, strmList in result:
         for url, filePath in strmList:
-            print(f"{url} > {filePath}\n")
+            print(f"🔗 {url} 📝 {filePath}")
             directory = os.path.dirname(filePath)
             os.makedirs(directory, exist_ok=True)
             with open(filePath, "w", encoding="UTF-8") as f:
