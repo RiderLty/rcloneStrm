@@ -1,6 +1,12 @@
 from utils.rclonetools import *
 import json
 import os
+import mimetypes
+
+
+def get_content_type(file_name):
+    content_type, _ = mimetypes.guess_type(file_name)
+    return content_type or "application/octet-stream"
 
 
 def getDownloadQueue(src, dst, host):
@@ -12,7 +18,7 @@ def getDownloadQueue(src, dst, host):
     for dirItem in lackDirs:
         dirBackend = rcloneJoin(src, dirItem["Path"])
         for file in json.loads(executeCommand(f'rclone lsjson --files-only --max-depth 9999 "{ dirBackend }"')["out"]):
-            if file["MimeType"].startswith("video"):
+            if get_content_type(file["Name"]).startswith("video"):
                 strmUrl = rcloneJoin(rcloneJoin(host, dirItem["Path"]), file["Path"])
                 fileDst = rcloneJoin(rcloneJoin(dst, dirItem["Path"]), file["Path"])
                 name, _ = os.path.splitext(fileDst)
@@ -33,7 +39,6 @@ syncList = [
 
 
 result = [getDownloadQueue(src, dst, host) for src, dst, host in syncList]
-
 for copyList, _ in result:
     rcloneCopy(copyList, True, 8)
 for _, strmList in result:
