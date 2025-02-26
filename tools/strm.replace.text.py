@@ -1,9 +1,8 @@
 import os
 
 PATH = r"/mnt/storage/Media/EmbyMedia"
-TARGET = "emby.router.local"
-REPLACEMENT = "emby.nas.local"
-DRY_RUN = True
+TARGET = "恶搞之家：第14季"
+REPLACEMENT = "S14"
 
 def list_files(path):
     file_paths = []
@@ -24,10 +23,11 @@ def handel(path, content):
 file_paths = list_files(PATH)
 for file in file_paths:
     if os.path.splitext(file)[1].lower() == ".strm":
-        print(file)
         content = open(file, "r", encoding="UTF-8").read()
-        new = handel(file, content)
-        print(file, "\n", content, "\n", new, "\n")
-        if DRY_RUN:
+        if content != handel(file, content):
+            print(file)
+            content = open(file, "r", encoding="UTF-8").read()
+            new = handel(file, content)
+            print(file, "\n", content, "\n", new, "\n")
             with open(file, "w", encoding="UTF-8") as f:
                 f.write(new)

@@ -1,3 +1,4 @@
+import mimetypes
 import shlex
 import sys
 from urllib.parse import urljoin
@@ -78,7 +79,11 @@ def rcloneJoin(a, b):
     """
     rclone的路径合并
     """
-    return a + b if a.endswith("/") else a + "/" + b
+    if a.endswith("/"):
+        return a + b
+    elif a.endswith(":"):
+        return a + b
+    return a + "/" + b
 
 
 def rcloneCopy(copyList, dry_run=True, worker_num=2):
@@ -93,6 +98,7 @@ def rcloneCopy(copyList, dry_run=True, worker_num=2):
     for src, dst in copyList:
         print(f"🌏️ {src} 👉️ {dst}")
         sem.acquire()
+
         def worker():
             try:
                 res = executeCommand(f'rclone copyto "{src}" "{dst}"', dry_run)
@@ -140,3 +146,12 @@ def backendPathJoin(backend, jsonResult):
     返回绝对路径
     """
     return [rcloneJoin(backend, x["Path"]) for x in jsonResult]
+
+
+def get_content_type(file_name):
+    content_type, _ = mimetypes.guess_type(file_name)
+    return content_type or "application/octet-stream"
+
+
+def backend_replacer(old, new):
+    return lambda x: f"{new}{x[len(old):]}"

@@ -8,8 +8,8 @@ syncList = [
 ]
 
 for src, dst in syncList:
-    cmd = f'rclone lsjson --files-only --max-depth 999 {src} --exclude "*.strm"  --exclude "*.ass"  --max-age 25h'#--exclude "*.ass" 
+    cmd = f'rclone lsjson --files-only --max-depth 999 {src} --exclude "*.strm"    --max-age 25h'#--exclude "*.ass" 
     files = json.loads(executeCommand(cmd)["out"])
     copyList = list(zip(backendPathJoin(src, files), backendPathJoin(dst, files)))
-    print("上传",len(copyList))
+    print(dst,"上传",len(copyList))
     rcloneCopy(copyList, False, 8)

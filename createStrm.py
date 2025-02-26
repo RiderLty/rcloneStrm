@@ -3,15 +3,9 @@ import json
 import os
 import mimetypes
 
-
-def get_content_type(file_name):
-    content_type, _ = mimetypes.guess_type(file_name)
-    return content_type or "application/octet-stream"
-
-
 def getDownloadQueue(src, dst, host):
-    srcFiles = json.loads(executeCommand(f"rclone lsjson --dirs-only --max-depth 1 {src}")["out"])
-    dstFiles = json.loads(executeCommand(f"rclone lsjson --dirs-only --max-depth 1 {dst}")["out"])
+    srcFiles = json.loads(executeCommand(f"rclone lsjson --dirs-only --max-depth 1 \"{src}\"")["out"])
+    dstFiles = json.loads(executeCommand(f"rclone lsjson --dirs-only --max-depth 1 \"{dst}\"")["out"])
     lackDirs = setDifference(srcFiles, dstFiles, lambda a, b: a["Path"] == b["Path"])  # 只比对路径
     copyList = []
     strmList = []
@@ -36,6 +30,13 @@ syncList = [
     ("123readonly:电影/", "/mnt/storage/Media/EmbyMedia/123pan/电影/", "http://emby.nas.local/strm/123pan/电影"),
     ("123readonly:番剧/", "/mnt/storage/Media/EmbyMedia/123pan/番剧/", "http://emby.nas.local/strm/123pan/番剧"),
 ]
+
+# syncList = [
+#     ("/mnt/storage/Downloads/link/[VCB-Studio] TenSura", "/mnt/storage/Media/EmbyMedia/123pan/番剧/[VCB-Studio] TenSura", "http://emby.nas.local/strm/123pan/番剧/[VCB-Studio] TenSura"),
+# ]
+
+
+
 
 
 result = [getDownloadQueue(src, dst, host) for src, dst, host in syncList]
