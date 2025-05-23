@@ -1,8 +1,8 @@
 import os
 
-PATH = r"/mnt/storage/Media/EmbyMedia"
-TARGET = "恶搞之家：第14季"
-REPLACEMENT = "S14"
+PATH = r"/mnt/storage/Media/EmbyMedia/123pan/番剧/Tensei.Shitara.Slime.Datta"
+TARGET = "/mnt/addons/CloudNAS/123云盘/"
+REPLACEMENT = "http://emby.nas.local/strm/123pan/"
 
 def list_files(path):
     file_paths = []
